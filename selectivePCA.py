@@ -1,7 +1,29 @@
 import numpy as np
-from MyPcaClass import MyPca as pca
 import matplotlib.pyplot as plt
-import myplot_module
+from MyPcaClass import MyPca as pca
+
+def BarPlot(data,sort=None,lim_line=0,newf=False,xTickLable=None):
+    '''
+    data can be in 1D or 0D,
+    it sorted is ask then it would sort both x tick and the data altogether
+    '''
+    data=data.reshape(-1)
+    x=range(1,len(data)+1)
+    plt.title('Not Sorted Bar PLot')
+    if xTickLable is not None:
+        plt.xticks(ticks=x,labels=xTickLable)
+    if newf is not False:
+        plt.figure()
+    if sort is True:
+        sort_idx=np.argsort(data)
+        data=np.sort(data)
+        xTickLable=['com'+str(sort_idx[i]+1) for i in range(len(sort_idx))]
+        plt.xticks(ticks=x,labels=xTickLable)
+        plt.title('Sorted Bar PLot')
+    plt.bar(x,data)  
+    if lim_line !=0:
+        plt.plot([0,len(data)+1],2*[lim_line],'k--',label='y = '+ str(lim_line))
+        plt.legend()
 
 def SPCA(data:np.ndarray,plotting=True):
     '''
@@ -32,7 +54,7 @@ def SPCA(data:np.ndarray,plotting=True):
         newColOrder[i]=OriginalIdx[selectedColIdx]
         OriginalIdx=np.delete(OriginalIdx,selectedColIdx)
 
-    newColOrder[-1] = np.setdiff1d(range(Num_directions),newColOrder[0:-1])
+    newColOrder[-1] = np.setdiff1d(range(Num_directions),newColOrder[0:-1])[0]
     CoveredR2[-1] = 1-np.sum(CoveredR2)
     organized_data=dataOrigin[:,newColOrder]
 
@@ -41,7 +63,7 @@ def SPCA(data:np.ndarray,plotting=True):
         
         plt.subplot(7,1,(1,3))
         xtick_label=['col'+str(newColOrder[i]+1) for i in range(Num_directions)]
-        myplot_module.BarPlot(CoveredR2*100,lim_line=90,xTickLable=xtick_label)
+        BarPlot(CoveredR2*100,lim_line=90,xTickLable=xtick_label)
 
         plt.xlabel('Original Column Number')
         plt.ylabel('Covered Variance (%)')
@@ -50,7 +72,7 @@ def SPCA(data:np.ndarray,plotting=True):
         plt.subplot(7,1,(5,7))
         all_coveredR2 = np.cumsum(CoveredR2)
         xtick_label=[str(i+1)+'col' for i in range(Num_directions)]
-        myplot_module.BarPlot(all_coveredR2*100,lim_line=90,xTickLable=xtick_label)
+        BarPlot(all_coveredR2*100,lim_line=90,xTickLable=xtick_label)
   
         plt.xlabel('Number of Used Columns')
         plt.ylabel('Covered Variance (%)')
@@ -58,3 +80,11 @@ def SPCA(data:np.ndarray,plotting=True):
         plt.show(block=False)
     return newColOrder,organized_data
 
+Num_observation=30
+Ninput=5
+Noutput=10
+
+X =np.random.rand(Num_observation,Ninput)
+Beta=np.random.rand(Ninput,Noutput) * 2 -1 
+Y=(X @ Beta)
+new_col,organized_data=SPCA(Y)

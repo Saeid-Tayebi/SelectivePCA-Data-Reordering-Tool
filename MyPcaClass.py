@@ -1,8 +1,6 @@
 import numpy as np
 from scipy.stats import chi2, f
 import matplotlib.pyplot as plt
-import plotly.graph_objects as go
-from plotly.subplots import make_subplots
 
 
 class MyPca:
