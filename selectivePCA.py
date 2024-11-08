@@ -1,3 +1,4 @@
+#%%
 import numpy as np
 import matplotlib.pyplot as plt
 from MyPcaClass import MyPca as pca
@@ -25,7 +26,7 @@ def BarPlot(data,sort=None,lim_line=0,newf=False,xTickLable=None):
         plt.plot([0,len(data)+1],2*[lim_line],'k--',label='y = '+ str(lim_line))
         plt.legend()
 
-def SPCA(data:np.ndarray,plotting=True):
+def SPCA(data:np.ndarray):
     '''
     it receives a block of data and sort its columns based on the independent variance seen in each column
     the return block's first column is the most indepedent column and the last column is the most dependent columns 
@@ -58,33 +59,39 @@ def SPCA(data:np.ndarray,plotting=True):
     CoveredR2[-1] = 1-np.sum(CoveredR2)
     organized_data=dataOrigin[:,newColOrder]
 
-    if plotting is True:
-        plt.figure()
-        
-        plt.subplot(7,1,(1,3))
-        xtick_label=['col'+str(newColOrder[i]+1) for i in range(Num_directions)]
-        BarPlot(CoveredR2*100,lim_line=90,xTickLable=xtick_label)
+    plt.figure()
+    
+    plt.subplot(7,1,(1,3))
+    xtick_label=['col'+str(newColOrder[i]+1) for i in range(Num_directions)]
+    BarPlot(CoveredR2*100,lim_line=90,xTickLable=xtick_label)
 
-        plt.xlabel('Original Column Number')
-        plt.ylabel('Covered Variance (%)')
-        plt.title('Variance Covered for Individual Columns(Sorted)')
+    plt.xlabel('Sorted Original Column Numbers')
+    plt.ylabel('Covered Variance (%)')
+    plt.title('Variance Covered for Individual Columns(Sorted)')
 
-        plt.subplot(7,1,(5,7))
-        all_coveredR2 = np.cumsum(CoveredR2)
-        xtick_label=[str(i+1)+'col' for i in range(Num_directions)]
-        BarPlot(all_coveredR2*100,lim_line=90,xTickLable=xtick_label)
-  
-        plt.xlabel('Number of Used Columns')
-        plt.ylabel('Covered Variance (%)')
-        plt.title('Variance Covered for n Columns')
-        plt.show(block=False)
-    return newColOrder,organized_data
+    plt.subplot(7,1,(5,7))
+    all_coveredR2 = np.cumsum(CoveredR2)
+    xtick_label=[str(i+1)+'col' for i in range(Num_directions)]
+    BarPlot(all_coveredR2*100,lim_line=90,xTickLable=xtick_label)
 
-Num_observation=30
-Ninput=5
-Noutput=10
+    plt.xlabel('Cumulative Columns Selected')
+    plt.ylabel('Covered Variance (%)')
+    plt.title('Variance Covered for n Columns')
+    plt.show(block=False)
+    return newColOrder , CoveredR2 , organized_data  
 
-X =np.random.rand(Num_observation,Ninput)
-Beta=np.random.rand(Ninput,Noutput) * 2 -1 
-Y=(X @ Beta)
-new_col,organized_data=SPCA(Y)
+# Code execution
+OriginalData=np.array([ [ 0.32449153, -0.37284353,  0.20279008, -0.27719296,  0.14349545],
+                        [ 0.33884964,  0.22548439, -0.00117191, -0.81653025, -0.00562129],
+                        [-0.03747781,  0.41583203,  0.09654524, -0.55816716, -0.27632115],
+                        [ 0.35052732,  0.16028855, -0.26095015, -0.47245232,  0.20200274],
+                        [ 0.4649153 ,  0.06998226,  0.00783886, -0.83527089,  0.10163089],
+                        [ 0.643428  , -0.47255018,  0.01768985, -0.46102387,  0.4111165 ],
+                        [ 0.55044962, -0.55239036, -0.25167061,  0.07820573,  0.60052114],
+                        [ 0.42278671, -0.42982882, -0.06171441, -0.07605556,  0.37649641],
+                        [ 0.15586103, -0.01676184,  0.15191581, -0.39260655, -0.04569263],
+                        [ 0.30366606,  0.18603854,  0.05744663, -0.77552741, -0.03616079]])
+
+new_col_order , CoveredR2 , OrganizedData =SPCA(OriginalData)
+
+# %%
