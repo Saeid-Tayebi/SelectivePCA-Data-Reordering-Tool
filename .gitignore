@@ -1,0 +1,7 @@
+.pytest_cache/
+.vscode/
+tests/
+*.ipynb
+setup.py
+dist/
+.DS_Store
